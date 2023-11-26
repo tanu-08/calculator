@@ -60,12 +60,12 @@ const App = () => {
     setCalc({
       ...calc,
       sign: value,
-      res: !calc.res && calc.num ? calc.num : calc.res,
+      res:  calc.num ? calc.num+value : calc.res,
       num: 0,
     });
   };
 
-//handles equal click
+//handles equals
   const equalsClickHandler = () => {
     if (calc.sign && calc.num) {
       const math = (a, b, sign) =>
@@ -84,13 +84,19 @@ const App = () => {
             ? "Can't divide with 0"
             : toLocaleString(
                 math(
-                  Number(removeSpaces(calc.res)),
+                  Number(removeSpaces(calc.res.substring(0,calc.res.length-1))),
                   Number(removeSpaces(calc.num)),
                   calc.sign
                 )
               ),
         sign: "",
-        num: 0,
+        num: toLocaleString(
+          math(
+            Number(removeSpaces(calc.res.substring(0,calc.res.length-1))),
+            Number(removeSpaces(calc.num)),
+            calc.sign
+          )
+        ),
       });
     }
   };
