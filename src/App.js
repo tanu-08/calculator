@@ -5,6 +5,7 @@ import ButtonBox from './components/ButtonBox';
 import Wrapper from './components/Wrapper';
 import Screen from './components/Screen';
 
+// creating array for setting button
 const btnValues = [
   ["C", "+-", "%", "/"],
   [7, 8, 9, "X"],
@@ -23,8 +24,11 @@ const App = () => {
     sign: "",
     num: 0,
     res: 0,
+    history:[],
+    containsDecimal: false
   });
-
+  
+// handle number click 
   const numClickHandler = (e) => {
     e.preventDefault();
     const value = e.target.innerHTML;
@@ -49,7 +53,8 @@ const App = () => {
 
     setCalc({
       ...calc,
-      num: !calc.num.toString().includes(".") ? calc.num + value : calc.num,
+      num: !calc.containsDecimal ? calc.num + value : calc.num,
+      containsDecimal: true
     });
   };
 
@@ -61,45 +66,55 @@ const App = () => {
       ...calc,
       sign: value,
       res:  calc.num ? calc.num+value : calc.res,
-      num: 0,
+      num: (calc.num.substring(calc.num.length-1,calc.num.length)==="+" || 
+      calc.num.substring(calc.num.length-1,calc.num.length)==="-" ||
+      calc.num.substring(calc.num.length-1,calc.num.length)==="/" 
+      || calc.num.substring(calc.num.length-1,calc.num.length)==="X")?calc.num.substring(0,calc.num.length-1)+value:calc.num+value,
+      containsDecimal: false,
     });
   };
 
-//handles equals
-  const equalsClickHandler = () => {
-    if (calc.sign && calc.num) {
-      const math = (a, b, sign) =>
-        sign === "+"
-          ? a + b
-          : sign === "-"
-          ? a - b
-          : sign === "X"
-          ? a * b
-          : a / b;
-
+    // Add this function to update the history
+    const updateHistory = (value) => {
       setCalc({
         ...calc,
-        res:
-          calc.num === "0" && calc.sign === "/"
-            ? "Can't divide with 0"
-            : toLocaleString(
-                math(
-                  Number(removeSpaces(calc.res.substring(0,calc.res.length-1))),
-                  Number(removeSpaces(calc.num)),
-                  calc.sign
-                )
-              ),
+        history: [...calc.history, value],
+      });
+    };
+//handles equals
+const equalsClickHandler = () => {
+  if (calc.sign && calc.num) {
+    const math = (a, b, sign) =>
+      sign === "+"
+        ? a + b
+        : sign === "-"
+        ? a - b
+        : sign === "X"
+        ? a * b
+        : a / b;
+
+    let expression =calc.num;
+    console.log(expression);
+
+    try {
+      expression = expression.replace(/X/g, '*');
+      let result = eval(expression);
+
+      setCalc({
         sign: "",
-        num: toLocaleString(
-          math(
-            Number(removeSpaces(calc.res.substring(0,calc.res.length-1))),
-            Number(removeSpaces(calc.num)),
-            calc.sign
-          )
-        ),
+        num: toLocaleString(result),
+        res: toLocaleString(result),
+      });
+    } catch (error) {
+      setCalc({
+        ...calc,
+        res: "Error",
+        sign: "",
+        num: 0,
       });
     }
-  };
+  }
+};
 
   //making number positive or negative
   const invertClickHandler = () => {
