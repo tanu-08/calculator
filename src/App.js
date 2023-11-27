@@ -33,19 +33,20 @@ const App = () => {
     e.preventDefault();
     const value = e.target.innerHTML;
 
-    if (removeSpaces(calc.num).length < 16) {
+    if (removeSpaces(calc.num).length < 32) {
       setCalc({
         ...calc,
         num:
           calc.num === 0 && value === "0"
             ? "0"
             : removeSpaces(calc.num) % 1 === 0
-            ? toLocaleString(Number(removeSpaces(calc.num + value)))
-            : toLocaleString(calc.num + value),
+            ? toLocaleString(Number(removeSpaces(calc.num+value)))
+            : toLocaleString(calc.num+value),
         res: !calc.sign ? 0 : calc.res,
       });
     }
   };
+  //handle decimal click
 
   const commaClickHandler = (e) => {
     e.preventDefault();
@@ -58,6 +59,7 @@ const App = () => {
     });
   };
 
+  //handle airthmetic sign click 
   const signClickHandler = (e) => {
     e.preventDefault();
     const value = e.target.innerHTML;
@@ -74,13 +76,6 @@ const App = () => {
     });
   };
 
-    // Add this function to update the history
-    const updateHistory = (value) => {
-      setCalc({
-        ...calc,
-        history: [...calc.history, value],
-      });
-    };
 //handles equals
 const equalsClickHandler = () => {
   if (calc.sign && calc.num) {
@@ -93,12 +88,13 @@ const equalsClickHandler = () => {
         ? a * b
         : a / b;
 
-    let expression =calc.num;
+    let expression =removeSpaces(calc.num);
     console.log(expression);
 
     try {
       expression = expression.replace(/X/g, '*');
       let result = eval(expression);
+      console.log(result);
 
       setCalc({
         sign: "",
